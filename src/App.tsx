@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './App.css';
 import '@freee_jp/vibes/css';
-import { Button, Container, Header, SubSectionTitle, Note, Stack, CardBase } from '@freee_jp/vibes';
+import { Button, Container, Header, SubSectionTitle, Text, Stack, CardBase, HStack, ContentsBase, MessageDialog } from '@freee_jp/vibes';
 
 const allZeimushoOptions: string[] = [
     "麹町税務署",
@@ -100,6 +100,7 @@ const App: React.FC = () => {
   const handleButtonClick = () => {
     if (isRunning) {
       // Stop the bingo
+      setClicked(true);
       setIsRunning(false);
       if (generator.current) {
         clearInterval(generator.current);
@@ -127,24 +128,47 @@ const App: React.FC = () => {
     };
   }, []);
 
+  const [clicked, setClicked] = useState(false);
+
   return (
     <div className="App">
       <Header mb={2} disableGutters sectionDataList={[]} logo={<SubSectionTitle>税務署BINGO</SubSectionTitle>} />
-      <Container width="narrow" responsive={true}>
-        <Stack gap={2}>
-          <SubSectionTitle>
-            Current: {currentZeimusho}
-          </SubSectionTitle>
+      <Container width="normal" responsive={true}>
+        <ContentsBase>
+          <Stack alignItems='center'>
+            <Text size={1.5} weight='bold'>
+              {currentZeimusho}
+            </Text>
+            <MessageDialog
+              isOpen={clicked}
+              onRequestClose={() => setClicked(false)}
+              title="当選した税務署"
+              closeButtonLabel='閉じる'
+            >
+              <HStack alignItems='center' justifyContent='center'>
+                <img src='zeimusho.png' alt="税務署" style={{width: '10%'}} />
+                <Text size={1.5} weight='bold'>
+                  <div style={{fontSize: '3rem'}}>
+                    {currentZeimusho}
+                  </div>
+                </Text>
+                <img src='zeimusho.png' alt="税務署" style={{width: '10%'}} />
+              </HStack>
+            </MessageDialog>
 
-          <Button onClick={handleButtonClick}>{isRunning ? 'Stop' : 'Start'} !</Button>
+            <Button onClick={handleButtonClick} primary large>{isRunning ? 'ストップ！' : 'スタート！'}</Button>
+          </Stack>
 
-          <CardBase mt={2}>
-            Selected:
-            {selectedZeimushos.map((zeimusho, i) => (
-              <Note key={i}>{zeimusho}</Note>
-            ))}
-          </CardBase>
-        </Stack>
+            <CardBase mt={2}>
+              <SubSectionTitle>当選済みの税務署</SubSectionTitle>
+              <SubSectionTitle>残り{zeimushoOptions.length}件</SubSectionTitle>
+              <HStack mr={2} mt={1}>
+                {selectedZeimushos.map((zeimusho, i) => (
+                  <Text size={1.5} key={i}>{zeimusho}</Text>
+                ))}
+              </HStack>
+            </CardBase>
+        </ContentsBase>
       </Container>
     </div>
   );
